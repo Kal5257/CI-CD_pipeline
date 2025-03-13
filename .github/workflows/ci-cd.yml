@@ -50,6 +50,6 @@ jobs:
       - name: Deploy to Heroku
         run: |
           echo ${{ secrets.HEROKU_API_KEY }} | docker login --username=_ --password-stdin registry.heroku.com
-          docker tag ${{ secrets.DOCKER_HUB_USERNAME }}/flask-devops-app:latest registry.heroku.com/glacial-lowlands-50508/web
+          docker tag ${{ secrets.DOCKER_HUB_USERNAME }}/ci-cd_pipeline:latest registry.heroku.com/glacial-lowlands-50508/web
           docker push registry.heroku.com/glacial-lowlands-50508/web
           heroku container:release web -a glacial-lowlands-50508
