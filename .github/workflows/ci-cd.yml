@@ -46,6 +46,12 @@ jobs:
           docker push kal5257/ci-cd_pipeline:latest
 
 
+       # Install Heroku CLI
+      - name: Install Heroku CLI
+        run: |
+         curl https://cli-assets.heroku.com/install.sh | sh
+
+
       # Heroku deployment
       - name: Deploy to Heroku
         run: |
