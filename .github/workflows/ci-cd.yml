@@ -48,21 +48,25 @@ jobs:
           docker build -t australia-southeast2-docker.pkg.dev/project-k8-primordial/ci-cd-pipeline/ci-cd_pipeline:latest .
           docker push australia-southeast2-docker.pkg.dev/project-k8-primordial/ci-cd-pipeline/ci-cd_pipeline:latest
 
-       # Deploying to GKE
-      - name: Setting up kubectl
-        run: |
-          gcloud container clusters get-credentials my-cluster --region australia-southeast2-a --project ${{ secrets.GCP_PROJECT_ID }}
-
-      # Installing GKE authentication plugin 
-      - name: Instalingl gke-gcloud-auth-plugin
+      # Fix GPG key issue for Google Cloud SDK
+      - name: Fix GPG Key for Google Cloud SDK
         run: |
           sudo mkdir -p -m 755 /usr/share/keyrings
           curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo tee /usr/share/keyrings/cloud.google.gpg > /dev/null
           echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] http://packages.cloud.google.com/apt cloud-sdk main" | sudo tee /etc/apt/sources.list.d/google-cloud-sdk.list
           sudo apt-get update
-          sudo apt-get install -y google-cloud-sdk-gke-gcloud-auth-plugin
-          export USE_GKE_GCLOUD_AUTH_PLUGIN=True
 
+      # Install GKE Authentication Plugin
+      - name: Install gke-gcloud-auth-plugin
+        run: |
+          sudo apt-get install -y google-cloud-sdk-gke-gcloud-auth-plugin
+          echo "export USE_GKE_GCLOUD_AUTH_PLUGIN=True" >> ~/.bashrc
+          source ~/.bashrc
+
+      # Deploying to GKE
+      - name: Setting up kubectl
+        run: |
+          gcloud container clusters get-credentials my-cluster --region australia-southeast2-a --project ${{ secrets.GCP_PROJECT_ID }}
 
       - name: Deploying to GKE
         run: |
