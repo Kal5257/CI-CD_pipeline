@@ -48,10 +48,16 @@ jobs:
           docker build -t australia-southeast2-docker.pkg.dev/project-k8-primordial/ci-cd-pipeline/ci-cd_pipeline:latest .
           docker push australia-southeast2-docker.pkg.dev/project-k8-primordial/ci-cd-pipeline/ci-cd_pipeline:latest
 
-      # Deploying to GKE
+       # Deploying to GKE
       - name: Setting up kubectl
         run: |
           gcloud container clusters get-credentials my-cluster --region australia-southeast2-a --project ${{ secrets.GCP_PROJECT_ID }}
+
+      # Installing GKE Authentication Plugin
+      - name: Installing gke-gcloud-auth-plugin
+        run: |
+          gcloud components install gke-gcloud-auth-plugin
+          export USE_GKE_GCLOUD_AUTH_PLUGIN=True
 
       - name: Deploying to GKE
         run: |
