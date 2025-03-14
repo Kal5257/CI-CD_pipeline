@@ -51,7 +51,7 @@ jobs:
       # Deploying to GKE
       - name: Setting up kubectl
         run: |
-          gcloud container clusters get-credentials ${{ secrets.GKE_CLUSTER }} --region australia-southeast1 --project ${{ secrets.GCP_PROJECT_ID }}
+          gcloud container clusters get-credentials my-cluster --region australia-southeast2 --project ${{ secrets.GCP_PROJECT_ID }}
 
       - name: Deploying to GKE
         run: |
