@@ -48,20 +48,22 @@ jobs:
           docker build -t australia-southeast2-docker.pkg.dev/project-k8-primordial/ci-cd-pipeline/ci-cd_pipeline:latest .
           docker push australia-southeast2-docker.pkg.dev/project-k8-primordial/ci-cd-pipeline/ci-cd_pipeline:latest
 
-      # Fix GPG key issue for Google Cloud SDK
-      - name: Fix GPG Key for Google Cloud SDK
+      # Install Google Cloud SDK manually 
+      - name: Manually Install Google Cloud SDK
         run: |
-          sudo mkdir -p -m 755 /usr/share/keyrings
-          curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo tee /usr/share/keyrings/cloud.google.gpg > /dev/null
-          echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] http://packages.cloud.google.com/apt cloud-sdk main" | sudo tee /etc/apt/sources.list.d/google-cloud-sdk.list
-          sudo apt-get update
+          curl -fsSL https://sdk.cloud.google.com | bash
+          echo 'export PATH="$HOME/google-cloud-sdk/bin:$PATH"' >> $HOME/.bashrc
+          source $HOME/.bashrc  # Ensure it's loaded
 
       # Install GKE Authentication Plugin
       - name: Install gke-gcloud-auth-plugin
         run: |
-          sudo apt-get install -y google-cloud-sdk-gke-gcloud-auth-plugin
-          echo "export USE_GKE_GCLOUD_AUTH_PLUGIN=True" >> ~/.bashrc
-          source ~/.bashrc
+          gcloud components install gke-gcloud-auth-plugin --quiet
+          export USE_GKE_GCLOUD_AUTH_PLUGIN=True
+
+      # Verify that the plugin is installed correctly
+      - name: Verify GKE Authentication Plugin Installation
+        run: gcloud components list | grep gke-gcloud-auth-plugin || echo "Plugin not found!"
 
       # Deploying to GKE
       - name: Setting up kubectl
@@ -72,6 +74,7 @@ jobs:
         run: |
           kubectl apply -f k8s/deployment.yaml
           kubectl apply -f k8s/service.yaml
+
 
       # Backup Deployment: Pushing to Docker Hub
       - name: Logging in to Docker Hub
