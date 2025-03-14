@@ -30,7 +30,7 @@ jobs:
       # Running tests
       - name: Running tests
         run: |
-          python -m pytest  # Add your test command here
+          python -m pytest  
 
       # Authenticating with Google Cloud
       - name: Authenticating with Google Cloud
@@ -40,18 +40,18 @@ jobs:
 
       # Configuring Docker for Artifact Registry
       - name: Configuring Docker for Artifact Registry
-        run: gcloud auth configure-docker australia-southeast1-docker.pkg.dev
+        run: gcloud auth configure-docker australia-southeast2-docker.pkg.dev
 
       # Building and pushing Docker image to Artifact Registry
       - name: Build and Push Docker image to GCP Artifact Registry
         run: |
-          docker build -t australia-southeast1-docker.pkg.dev/project-k8-primordial/ci-cd-pipeline/ci-cd_pipeline:latest .
-          docker push australia-southeast1-docker.pkg.dev/project-k8-primordial/ci-cd-pipeline/ci-cd_pipeline:latest
+          docker build -t australia-southeast2-docker.pkg.dev/project-k8-primordial/ci-cd-pipeline/ci-cd_pipeline:latest .
+          docker push australia-southeast2-docker.pkg.dev/project-k8-primordial/ci-cd-pipeline/ci-cd_pipeline:latest
 
       # Deploying to GKE
       - name: Setting up kubectl
         run: |
-          gcloud container clusters get-credentials my-cluster --region australia-southeast2 --project ${{ secrets.GCP_PROJECT_ID }}
+          gcloud container clusters get-credentials my-cluster --region australia-southeast2-a --project ${{ secrets.GCP_PROJECT_ID }}
 
       - name: Deploying to GKE
         run: |
@@ -67,7 +67,7 @@ jobs:
 
       - name: Building and pushing Docker image to Docker Hub
         run: |
-          docker tag australia-southeast1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/ci-cd-pipeline/ci-cd_pipeline:latest ${{ secrets.DOCKER_HUB_USERNAME }}/ci-cd_pipeline:latest
+          docker tag australia-southeast2-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/ci-cd-pipeline/ci-cd_pipeline:latest ${{ secrets.DOCKER_HUB_USERNAME }}/ci-cd_pipeline:latest
           docker push ${{ secrets.DOCKER_HUB_USERNAME }}/ci-cd_pipeline:latest
 
       # Backup Deployment: Deploying to Heroku
